@@ -4,7 +4,7 @@ import requests
 
 def read_url(url_name, time_out=10):
     try:
-        data = requests.get(url_name, time_out)
+        data = requests.get(url_name, timeout=time_out)
     except:
         print('Err: {}'.format(url_name))
 
