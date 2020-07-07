@@ -4,13 +4,15 @@ import threading
 import queue
 from time import time
 
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 
 from soup_of_url import soup_of_url
 
 # declare mongodb
-client = MongoClient('mongodb://localhost:27017/')
-db = client.test_database
+
+client = MongoClient("mongodb+srv://giftza:giftza@cluster0.qquas.mongodb.net/test?retryWrites=true&w=majority")
+db = client.test
+
 
 # product filter
 tags = ['family-gift', 'Relationship', 'special-gifts', 'mother-s-day', 'father-s-day', 'Holidays%20&%20Events']
@@ -24,13 +26,16 @@ sort = ['-popularity', '-createdAt', 'price', '-price']
 # category queue
 category = queue.Queue()
 
+# bulk write
+bulk = []
+
 
 def push_mongo(url_obj):
     """
     :param url_obj: {'url':, 'product_code':}
     """
-    db.product_urls.update_one({'product_code': url_obj['product_code']}, {'$set': url_obj}, upsert=True)
-
+    # db.product_urls.update_one({'product_code': url_obj['product_code']}, {'$set': url_obj}, upsert=True)
+    bulk.append(UpdateOne({'product_code': url_obj['product_code']}, {'$set': url_obj}, upsert=True))
 
 def amount_of_item(soup):
     """
@@ -120,6 +125,8 @@ def main():
     list_category_to_queue()
 
     category.join()
+
+    db.product_urls.bulk_write(bulk)
 
 
 if __name__ == '__main__':
