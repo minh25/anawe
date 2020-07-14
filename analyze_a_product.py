@@ -1,70 +1,86 @@
-from bs4 import BeautifulSoup
-import requests
-
-from soup_of_url import  soup_of_url
+from soup_of_url import soup_of_url
 
 
-def extract_product_price(soup, do_print=True):
-    div_contain_price = soup.find("span", class_="lg:fs-2xl")
-    span_in_div_contain_price = div_contain_price.find("span")
+def extract_product_price(soup, do_print=True, url='#'):
+    try:
+        div_contain_price = soup.find("span", class_="lg:fs-2xl")
+        span_in_div_contain_price = div_contain_price.find("span")
 
-    if do_print == True:
-        print(span_in_div_contain_price.contents[0])
-        print("product price")
+        if do_print:
+            print(span_in_div_contain_price.contents[0])
+            print("product price")
 
-    return span_in_div_contain_price.contents[0]
+        return span_in_div_contain_price.contents[0]
+    except Exception as error:
+        print(error, "of price", "in", url)
+        return "#"
 
-def extract_image_urls(soup, do_print=True):
+
+def extract_image_urls(soup, do_print=True, url='#'):
     image_urls = []
-    for div_contain_img in soup.find_all("div", class_="child-container"):
-        image_urls.append(div_contain_img.find_all("img")[0]['src'])
+    try:
+        div_contain_list_of_img = soup.find("div", class_="w-3p5")
+        for img_tag in div_contain_list_of_img.find_all("img"):
+            image_urls.append((img_tag['src']))
 
-    if do_print == True:
-        print("image url")
-        for image_url in image_urls:
-            print(image_url)
-        print()
+        if do_print:
+            print("image url")
+            for image_url in image_urls:
+                print(image_url)
+            print()
+    except Exception as error:
+        print(error, "of image", "in", url)
 
     return image_urls
 
-def extract_product_name(soup, do_print=True):
-    div_contain_name = soup.find("h1", class_="lg:fs-lg")
-    spans_in_div_contain_name = div_contain_name.find_all("span")
 
-    if do_print == True:
-        print("product name")
-        print(spans_in_div_contain_name[0].contents[0])
-        print(spans_in_div_contain_name[2].contents[0])
-        print()
+def extract_product_name(soup, do_print=True, url='#'):
+    try:
+        div_contain_name = soup.find("h1", class_="lg:fs-lg")
+        spans_in_div_contain_name = div_contain_name.find_all("span")
 
-    return spans_in_div_contain_name[0].contents[0] + ' ' + spans_in_div_contain_name[2].contents[0]
+        if do_print:
+            print("product name")
+            print(spans_in_div_contain_name[0].contents[0])
+            print(spans_in_div_contain_name[2].contents[0])
+            print()
 
-def extract_campaign_details(soup, do_print=True):
+        return spans_in_div_contain_name[0].contents[0] + ' ' + spans_in_div_contain_name[2].contents[0]
+    except Exception as error:
+        print(error, "of name", "in", url)
+
+
+def extract_campaign_details(soup, do_print=True, url='#'):
     campaign_details = ''
-    div_contain_campaign_details = soup.find("div", class_="px-1 pb-1 lg:px-0 bgc-white")
-    div_in_div_contain_campaign_details = div_contain_campaign_details.div
-    for div in div_in_div_contain_campaign_details.find_all("div"):
-        if div.contents[0] != '<br/>':
-            campaign_details = campaign_details + ' ' + str(div.contents[0])
+    try:
+        div_contain_campaign_details = soup.find("div", class_="px-1 pb-1 lg:px-0 bgc-white")
+        div_in_div_contain_campaign_details = div_contain_campaign_details.div
+        for div in div_in_div_contain_campaign_details.find_all("div"):
+            if div.contents[0] != '<br/>':
+                campaign_details = campaign_details + ' ' + str(div.contents[0])
 
-    if do_print == True:
-        print("campaign details")
-        print(campaign_details)
+        if do_print:
+            print("campaign details")
+            print(campaign_details)
+    except Exception as error:
+        print(error, "of detail", "in", url)
 
     return campaign_details
 
 
-def analyze(soup):
-    detail = []
-
-    detail.append(extract_product_price(soup))
-    detail.append(extract_image_urls(soup))
-    detail.append(extract_product_name(soup))
-    detail.append(extract_campaign_details(soup))
+def analyze_soup_of_a_product(soup, urlx):
+    detail = [extract_product_price(soup=soup, do_print=False, url=urlx),
+              extract_image_urls(soup=soup, do_print=False, url=urlx),
+              extract_product_name(soup=soup, do_print=False, url=urlx),
+              extract_campaign_details(soup=soup, do_print=False, url=urlx)]
 
     return detail
 
 
+def main(url):
+    for x in analyze_soup_of_a_product(soup_of_url(url), url):
+        print(x)
+
+
 if __name__ == '__main__':
-    print(analyze(soup_of_url(
-        'https://www.giftza.co/campaigns/-/-/tags/Holidays%20%26%20Events/papa-legend-bad-influence?retailProductCode=DBD375D877A0B6-E8F5D89CE8FA-GS2-TC4-BLK')))
+    main('https://www.giftza.co/campaigns/-/-/tags/Holidays%20%26%20Events/stop-staring-at-my-shamrocks-1?retailProductCode=DBD375D877A0B6-9A280E99A8AE-GS2-TC2-KGR')
