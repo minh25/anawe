@@ -1,3 +1,11 @@
+# mày có một file get_category nhưng thực chất là get hết tất cả url của các menu
+# được xử lí 30 luồng
+# trả về 1 queue gồm toàn những menu url full 5 chỉ số chỉ thẳng mặt từng page một
+# gon gàng
+# bao xịn
+#
+# menu_urls: queue(links have _tag, _sort, _page, _department, _product)
+
 import threading
 import queue
 from time import time
@@ -88,10 +96,12 @@ def get_category_without_sort_page():
             category_without_sort_page.put((_tag, _department, _product))
 
 
+# cho gọn
 def url3(_tag, _department, _product):
     return "https://www.giftza.co/tags/{}/department/{}/product/{}".format(_tag, _department, _product)
 
 
+# cho gọn
 def url5(_tag, _sort, _page, _department, _product):
     return "https://www.giftza.co/tags/{}/sort/{}/page/{}/department/{}/product/{}".format(_tag, _sort, _page,
                                                                                            _department, _product)
@@ -132,6 +142,10 @@ def get_category():
 
 
 def main():
+    """
+    add thread... simply
+    :return:
+    """
     for _ in range(30):
         threading.Thread(target=get_category, daemon=True).start()
 
