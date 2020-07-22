@@ -89,7 +89,7 @@ def amount_of_item_each_category(soup, url):
         return int(-1)
 
 
-def get_category_without_sort_page():
+def create_category_without_sort_page():
     _tag = 'Holidays%20&%20Events'
     for _department in department:
         for _product in product:
@@ -123,16 +123,16 @@ def get_category():
             print(amount, url)
             page = int((amount + 35) / 36)
 
-            if page > 0:
-                if page <= 25:
+            if amount > 0:
+                if amount <= 900:
                     _sort = sort[0]
                     for _page in range(1, page + 1, 1):
-                        menu_url = url5(_tag,_sort,_page,_department,_product)
+                        menu_url = url5(_tag, _sort, _page, _department, _product)
                         menu_urls.put(menu_url)
-                if page > 25:
+                if amount > 900:
                     for _sort in sort:
                         for _page in range(1, 26, 1):
-                            menu_url = url5(_tag,_sort,_page,_department,_product)
+                            menu_url = url5(_tag, _sort, _page, _department, _product)
                             menu_urls.put(menu_url)
         # except Exception as error:
         #     print("##########################")
@@ -148,8 +148,6 @@ def main():
     """
     for _ in range(30):
         threading.Thread(target=get_category, daemon=True).start()
-
-    get_category_without_sort_page()
 
     category_without_sort_page.join()
 
